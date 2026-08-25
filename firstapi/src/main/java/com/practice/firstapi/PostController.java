@@ -1,5 +1,6 @@
 package com.practice.firstapi;
 
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -22,10 +23,8 @@ public class PostController {
     }
 
     @GetMapping("/posts/{id}")
-    public ResponseEntity<Post> byId(@PathVariable Long id){
-        return service.findById(id)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+    public Post byId(@PathVariable Long id){
+        return service.getById(id);
     }
 
     @DeleteMapping("/posts/{id}")
@@ -35,10 +34,15 @@ public class PostController {
                : ResponseEntity.notFound().build();
     }
     @PutMapping("/posts/{id}")
-    public ResponseEntity<Post> update(@PathVariable Long id
+    public ResponseEntity<Post> update(@Valid @PathVariable Long id
     , @RequestBody Post post){
         return service.update(id,post)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
+    }
+    @PostMapping("/posts")
+    public ResponseEntity<Post> create(@Valid @RequestBody Post post){
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(service.create(post));
     }
 }

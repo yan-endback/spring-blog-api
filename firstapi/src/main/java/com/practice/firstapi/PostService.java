@@ -13,7 +13,12 @@ public class PostService {
             new Post(2L, "второй пост", "тело", 2L),
             new Post(3L, "третий пост", "тело", 3L)
     ));
-
+    public Post getById(Long id){
+        return posts.stream()
+                .filter(i -> i.id().equals(id))
+                .findFirst()
+                .orElseThrow(() -> new PostNotFoundException(id));
+    }
     public PostService() {
         System.out.println("создан СЕРВИС");
 
