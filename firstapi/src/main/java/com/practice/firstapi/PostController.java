@@ -17,10 +17,6 @@ public class PostController {
         System.out.println("создан КОНТРОЛЛЕР");
     }
 
-    @GetMapping("/posts")
-    public List<Post> all(){
-        return service.findAll();
-    }
 
     @GetMapping("/posts/{id}")
     public Post byId(@PathVariable Long id){
@@ -28,14 +24,14 @@ public class PostController {
     }
 
     @DeleteMapping("/posts/{id}")
-    public ResponseEntity<Void> delete(Long id){
+    public ResponseEntity<Void> delete(@PathVariable Long id){
        return service.delete(id)
                ? ResponseEntity.noContent().build()
-               : ResponseEntity.notFound().build();
-    }
+                   : ResponseEntity.notFound().build();
+        }
     @PutMapping("/posts/{id}")
-    public ResponseEntity<Post> update(@Valid @PathVariable Long id
-    , @RequestBody Post post){
+    public ResponseEntity<Post> update( @PathVariable Long id
+    ,@Valid @RequestBody Post post){
         return service.update(id,post)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
@@ -44,5 +40,12 @@ public class PostController {
     public ResponseEntity<Post> create(@Valid @RequestBody Post post){
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(service.create(post));
+    }
+    @GetMapping ("/posts")
+    public List<Post> findByUserId(@RequestParam (required = false) Long userId) {
+        if (userId == null){
+            return service.findAll();
+    }
+        return service.findByUser(userId);
     }
 }

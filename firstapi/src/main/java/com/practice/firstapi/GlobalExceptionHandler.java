@@ -28,4 +28,11 @@ public class GlobalExceptionHandler {
                 .collect(Collectors.joining("; "));
         return ResponseEntity.badRequest().body(new ErrorResponse(400, msg));
     }
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<ErrorResponse> anyOther(Exception e) {
+        e.printStackTrace();
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+
+                .body(new ErrorResponse(500, "внутренняя ошибка"));
+    }
 }

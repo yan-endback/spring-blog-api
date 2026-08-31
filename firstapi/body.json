@@ -1,6 +1,5 @@
 {
-  "id":5,
-  "title": "",
-  "body": "telo",
-  "userId": 1
+  "title": "обновлённый title",
+  "body": "обновлённый body",
+  "userId": 2
 }

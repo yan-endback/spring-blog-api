@@ -1,5 +1,6 @@
 package com.practice.firstapi;
 
+import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -8,41 +9,33 @@ import java.util.Optional;
 
 @Service
 public class PostService {
-    private final List<Post> posts = new ArrayList<>(List.of(
-            new Post(1L, "первый пост", "тело", 1L),
-            new Post(2L, "второй пост", "тело", 2L),
-            new Post(3L, "третий пост", "тело", 3L)
-    ));
+    private final PostRepository repository;
+    public PostService(PostRepository r){ this.repository=r;}
+
+    public List<Post> findAll() {return repository.findAll();}
+
     public Post getById(Long id){
-        return posts.stream()
-                .filter(i -> i.id().equals(id))
-                .findFirst()
-                .orElseThrow(() -> new PostNotFoundException(id));
-    }
-    public PostService() {
-        System.out.println("создан СЕРВИС");
-
+        return repository.findById(id)
+                .orElseThrow(()-> new PostNotFoundException(id));
     }
 
-    public List<Post> findAll(){ return posts; }
-
-    public Optional<Post> findById(Long id) {
-        return posts.stream()
-                .filter(e -> e.id().equals(id))
-                .findFirst();
-    }
-
-    public Post create(Post post) {posts.add(post); return post;}
-
+    public Post create(Post post) {return repository.save(post);}
+    @Transactional
     public boolean delete(Long id){
-        return posts.removeIf(e -> e.id().equals(id));
+        if (!repository.existsById(id)) return false;
+        repository.deleteById(id); return true;
     }
 
-    public Optional<Post> update (Long id, Post newPost){
-        boolean removed = posts.removeIf(p -> p.id().equals(id));
-        if (!removed) return  Optional.empty();
-        Post replaced = new Post(id,newPost.title(), newPost.body(), newPost.userId());
-        posts.add(replaced);
-        return Optional.of(replaced);
+    public Optional<Post> update(Long id,Post newPost){
+        return repository.findById(id)
+                .map(existing -> {
+                    existing.setTitle(newPost.getTitle());
+                    existing.setBody(newPost.getBody());
+                    existing.setUserId(newPost.getUserId());
+                    return repository.save(existing);
+                });
+    }
+    public List<Post> findByUser(Long userId){
+        return repository.findByUserId(userId);
     }
 }
