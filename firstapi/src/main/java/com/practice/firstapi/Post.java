@@ -1,8 +1,6 @@
 package com.practice.firstapi;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import org.springframework.web.bind.annotation.GetMapping;
 
 import java.util.ArrayList;
@@ -23,9 +21,10 @@ public class Post {
 
     protected Post() {}
 
-    public Post (String title,String body){
+    public Post (String title,String body,Author author){
         this.body=body;
         this.title=title;
+        this.author=author;
     }
 
     public Long getId() { return id; }

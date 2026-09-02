@@ -35,4 +35,9 @@ public class GlobalExceptionHandler {
 
                 .body(new ErrorResponse(500, "внутренняя ошибка"));
     }
+    @ExceptionHandler(AuthorNotFoundException.class)
+    public ResponseEntity<ErrorResponse> notFoundAuthor(AuthorNotFoundException e){
+        return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                .body(new ErrorResponse(404,e.getMessage()));
+    }
 }

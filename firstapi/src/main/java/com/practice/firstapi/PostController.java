@@ -3,6 +3,7 @@ package com.practice.firstapi;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Repository;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
@@ -17,10 +18,9 @@ public class PostController {
         System.out.println("создан КОНТРОЛЛЕР");
     }
 
-
     @GetMapping("/posts/{id}")
-    public Post byId(@PathVariable Long id){
-        return service.getById(id);
+    public ResponseEntity<PostResponse> byId(@PathVariable Long id) {
+        return ResponseEntity.ok(service.getById(id));
     }
 
     @DeleteMapping("/posts/{id}")
@@ -36,16 +36,13 @@ public class PostController {
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
-    @PostMapping("/posts")
-    public ResponseEntity<Post> create(@Valid @RequestBody Post post){
-        return ResponseEntity.status(HttpStatus.CREATED)
-                .body(service.create(post));
-    }
     @GetMapping ("/posts")
-    public List<Post> findByUserId(@RequestParam (required = false) Long userId) {
-        if (userId == null){
-            return service.findAll();
+    public List<PostResponse> all(){
+        return service.findAll();
     }
-        return service.findByUser(userId);
+    @PostMapping("/posts")
+    public ResponseEntity<PostResponse> create(@Valid @RequestBody PostRequest request){
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(service.create(request));
     }
 }

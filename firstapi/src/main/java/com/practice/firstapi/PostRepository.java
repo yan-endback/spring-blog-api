@@ -10,7 +10,7 @@ import java.util.List;
 @Repository
 public interface PostRepository extends JpaRepository<Post,Long> {
     List<Post> findByAuthorId(Long authorId);
-@EntityGraph(attributePaths = "author")
-    List<Post> findAll();
+@Query("SELECT p FROM Post p JOIN FETCH p.author")
+    List<Post> findAllWithAuthors();
 
 }
