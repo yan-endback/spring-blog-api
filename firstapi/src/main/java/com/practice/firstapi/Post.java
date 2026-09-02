@@ -16,21 +16,23 @@ public class Post {
 
     private String title;
     private String body;
-    private Long userId;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "author_id")
+    private Author author;
 
     protected Post() {}
 
-    public Post (String title,String body,Long userId){
+    public Post (String title,String body){
         this.body=body;
-        this.userId=userId;
         this.title=title;
     }
 
     public Long getId() { return id; }
     public String getTitle() { return title; }
     public String getBody() { return body; }
-    public Long getUserId() { return userId; }
+    public Author getAuthor() { return author; }
     public void setTitle(String t) { this.title = t; }
     public void setBody(String b) { this.body = b; }
-    public void setUserId(Long u) { this.userId = u; }
+    public void setAuthor(Author author) { this.author = author; }
 }

@@ -31,11 +31,11 @@ public class PostService {
                 .map(existing -> {
                     existing.setTitle(newPost.getTitle());
                     existing.setBody(newPost.getBody());
-                    existing.setUserId(newPost.getUserId());
+                    existing.setAuthor(newPost.getAuthor());
                     return repository.save(existing);
                 });
     }
-    public List<Post> findByUser(Long userId){
-        return repository.findByUserId(userId);
+    public List<Post> findByUser(Long authorId){
+        return repository.findByAuthorId(authorId);
     }
 }
