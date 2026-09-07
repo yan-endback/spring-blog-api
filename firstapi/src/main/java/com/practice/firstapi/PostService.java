@@ -4,7 +4,6 @@ import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -45,16 +44,28 @@ public class PostService {
         repository.deleteById(id); return true;
     }
 
-    public Optional<Post> update(Long id,Post newPost){
-        return repository.findById(id)
-                .map(existing -> {
-                    existing.setTitle(newPost.getTitle());
-                    existing.setBody(newPost.getBody());
-                    existing.setAuthor(newPost.getAuthor());
-                    return repository.save(existing);
-                });
+    public PostResponse update(Long id,PostRequest request){
+       Post post = repository.findById(id)
+                .orElseThrow(() -> new PostNotFoundException(id));
+        post.setBody(request.body());
+        post.setTitle(request.title());
+
+        Author author = authorRepository.findById(request.authorId())
+                .orElseThrow(()-> new AuthorNotFoundException(request.authorId()));
+        post.setAuthor(author);
+        Post saved = repository.save(post);
+        return mapper.toResponse(saved);
     }
     public List<Post> findByUser(Long authorId){
         return repository.findByAuthorId(authorId);
+    }
+    public List<PostResponse> byAuthor(Long authorId){
+        if (!authorRepository.existsById(authorId)){
+            throw new AuthorNotFoundException(authorId);
+        }
+        List<Post> posts = repository.findByAuthorId(authorId);
+        return posts.stream()
+                .map(mapper::toResponse)
+                .toList();
     }
 }

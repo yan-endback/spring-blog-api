@@ -27,14 +27,12 @@ public class PostController {
     public ResponseEntity<Void> delete(@PathVariable Long id){
        return service.delete(id)
                ? ResponseEntity.noContent().build()
-                   : ResponseEntity.notFound().build();
+                   : ResponseEntity.notFound().build(); 
         }
     @PutMapping("/posts/{id}")
-    public ResponseEntity<Post> update( @PathVariable Long id
-    ,@Valid @RequestBody Post post){
-        return service.update(id,post)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+    public PostResponse update(@PathVariable Long id,
+           @Valid @RequestBody PostRequest request){
+        return service.update(id,request);
     }
     @GetMapping ("/posts")
     public List<PostResponse> all(){
@@ -44,5 +42,11 @@ public class PostController {
     public ResponseEntity<PostResponse> create(@Valid @RequestBody PostRequest request){
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(service.create(request));
+    }
+    @GetMapping ("/authors/{id}/posts")
+    public List<PostResponse> byAuthor(
+            @PathVariable Long id
+    ){
+        return service.byAuthor(id);
     }
 }
