@@ -1,11 +1,15 @@
 package com.practice.firstapi;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.Customizer;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -13,22 +17,25 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
 
+
     @Bean
-    SecurityFilterChain filterChain(HttpSecurity http) throws Exception{
+    SecurityFilterChain filterChain(HttpSecurity http, JwtFilter jwtFilter) throws Exception{
         http
                 .csrf(csrf -> csrf.disable())
+                .sessionManagement(s -> s.sessionCreationPolicy(
+                        SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
+                        .requestMatchers("/auth/**").permitAll()
                         .requestMatchers(HttpMethod.DELETE,"/posts/**").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.GET, "/posts/**").permitAll()
-                        .requestMatchers("/posts/**").authenticated()
-                        .requestMatchers("/admin/**").hasRole("ADMIN")
                         .anyRequest().authenticated())
-                    .httpBasic(Customizer.withDefaults());
+                    .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
                 return http.build();
     }
     @Bean
@@ -49,4 +56,10 @@ public class SecurityConfig {
                 .build();
         return new InMemoryUserDetailsManager(user,admin);
     }
+
+    @Bean
+    AuthenticationManager authManager(AuthenticationConfiguration config) throws Exception{
+        return config.getAuthenticationManager();
+    }
+
 }
