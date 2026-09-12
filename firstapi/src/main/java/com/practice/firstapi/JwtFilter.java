@@ -29,7 +29,7 @@ public class JwtFilter extends OncePerRequestFilter {
             HttpServletResponse res, FilterChain chain) throws ServletException, IOException {
 
         String header = req.getHeader("Authorization");
-
+        System.out.println("ЗАГОЛОВОК: [" + header + "]");
         if (header != null && header.startsWith("Bearer ")){
             String token = header.substring(7);
             try {
@@ -39,8 +39,9 @@ public class JwtFilter extends OncePerRequestFilter {
                 var auth = new UsernamePasswordAuthenticationToken(
                         user,null, user.getAuthorities());
                 SecurityContextHolder.getContext().setAuthentication(auth);
+                System.out.println("ВОШЁЛ: " + username + " РОЛИ: " + user.getAuthorities());
             } catch (Exception e){
-                logger.error("Cannot set user authentication: {}", e);
+                e.printStackTrace();
             }
         }
         chain.doFilter(req , res);

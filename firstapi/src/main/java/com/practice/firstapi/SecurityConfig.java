@@ -30,12 +30,19 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 .sessionManagement(s -> s.sessionCreationPolicy(
                         SessionCreationPolicy.STATELESS))
+                .exceptionHandling(ex -> ex
+                .authenticationEntryPoint((request, response, e) -> {
+                    response.setStatus(401);
+                })
+                .accessDeniedHandler((request, response, e) -> {
+                    response.setStatus(403);
+                }))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/auth/**").permitAll()
                         .requestMatchers(HttpMethod.DELETE,"/posts/**").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.GET, "/posts/**").permitAll()
                         .anyRequest().authenticated())
-                    .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
+                        .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
                 return http.build();
     }
     @Bean
