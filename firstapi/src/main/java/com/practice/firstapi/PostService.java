@@ -1,6 +1,8 @@
 package com.practice.firstapi;
 
 import jakarta.transaction.Transactional;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 
@@ -35,6 +37,9 @@ public class PostService {
         Author author = authorRepository.findById(request.authorId())
                 .orElseThrow(() -> new AuthorNotFoundException(request.authorId()));
         Post saved = repository.save(mapper.toEntity(request,author));
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        String currentUser = auth.getName();
+        System.out.println("Пост создает: " + currentUser);
         return mapper.toResponse(saved);
     }
 

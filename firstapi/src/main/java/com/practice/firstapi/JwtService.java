@@ -13,9 +13,10 @@ public class JwtService {
     private final SecretKey key = Keys.hmacShaKeyFor(
             "очень-длинный-секретный-ключ-минимум-32-символа".getBytes());
 
-    public String generateToken(String username){
+    public String generateToken(String username,String role){
         return Jwts.builder()
                 .subject(username)
+                .claim("role",role)
                 .issuedAt(new Date())
                 .expiration(new Date(System.currentTimeMillis() + 1000 * 60 * 30))
                 .signWith(key)

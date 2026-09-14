@@ -5,6 +5,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
@@ -45,5 +46,10 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorResponse> badCredentials(BadCredentialsException e){
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                 .body(new ErrorResponse(401,"Неверный логин или пароль"));
+    }
+    @ExceptionHandler(UserAlreadyExistsException.class)
+    public ResponseEntity<ErrorResponse> handle(UserAlreadyExistsException e){
+        return ResponseEntity.status(HttpStatus.CONFLICT)
+                .body(new ErrorResponse(409,e.getMessage()));
     }
 }

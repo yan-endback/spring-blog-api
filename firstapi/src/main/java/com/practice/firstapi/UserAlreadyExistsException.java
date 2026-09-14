@@ -1,0 +1,8 @@
+package com.practice.firstapi;
+
+public class UserAlreadyExistsException extends RuntimeException{
+    public UserAlreadyExistsException(String username){
+        super("Пользователь уже существует: " + username);
+    }
+
+}

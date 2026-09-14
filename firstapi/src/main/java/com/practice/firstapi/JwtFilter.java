@@ -1,5 +1,6 @@
 package com.practice.firstapi;
 
+import io.jsonwebtoken.JwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -16,7 +17,7 @@ import java.io.IOException;
 
 @Component
 public class JwtFilter extends OncePerRequestFilter {
-    private final JwtService jwtService;
+        private final JwtService jwtService;
     private final UserDetailsService userDetailsService;
 
     public JwtFilter(JwtService jwtService, UserDetailsService userDetailsService) {
@@ -29,7 +30,6 @@ public class JwtFilter extends OncePerRequestFilter {
             HttpServletResponse res, FilterChain chain) throws ServletException, IOException {
 
         String header = req.getHeader("Authorization");
-        System.out.println("ЗАГОЛОВОК: [" + header + "]");
         if (header != null && header.startsWith("Bearer ")){
             String token = header.substring(7);
             try {
@@ -39,9 +39,8 @@ public class JwtFilter extends OncePerRequestFilter {
                 var auth = new UsernamePasswordAuthenticationToken(
                         user,null, user.getAuthorities());
                 SecurityContextHolder.getContext().setAuthentication(auth);
-                System.out.println("ВОШЁЛ: " + username + " РОЛИ: " + user.getAuthorities());
-            } catch (Exception e){
-                e.printStackTrace();
+            } catch (JwtException e){
+                // токен плохой или просрочен: не аутентифицируем, правила отдадут 401
             }
         }
         chain.doFilter(req , res);

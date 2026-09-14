@@ -49,20 +49,6 @@ public class SecurityConfig {
     PasswordEncoder passwordEncoder(){
         return new BCryptPasswordEncoder();
     }
-    @Bean
-        UserDetailsService users(PasswordEncoder encoder) {
-        UserDetails user = User.builder()
-                .username("murder")
-                .password(encoder.encode("pass123"))
-                .roles("USER")
-                .build();
-        UserDetails admin = User.builder()
-                .username("admin")
-                .password(encoder.encode("admin123"))
-                .roles("ADMIN")
-                .build();
-        return new InMemoryUserDetailsManager(user,admin);
-    }
 
     @Bean
     AuthenticationManager authManager(AuthenticationConfiguration config) throws Exception{
