@@ -14,6 +14,7 @@ public class CustomUserDetailsService implements UserDetailsService{
     CustomUserDetailsService(AppUserRepository repo){
         this.repo=repo;
     }
+
     @Override
     public UserDetails loadUserByUsername(String username){
         AppUser u = repo.findByUsername(username)
