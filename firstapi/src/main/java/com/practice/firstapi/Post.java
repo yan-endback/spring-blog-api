@@ -17,9 +17,39 @@ public class Post {
     private String body;
     private LocalDateTime createdAt;
 
+    public Post(String ownerUsername) {
+        this.ownerUsername = ownerUsername;
+    }
+
+    private String ownerUsername;
+
+    public String getOwnerUsername() {
+        return ownerUsername;
+    }
+
+    public void setOwnerUsername(String ownerUsername) {
+        this.ownerUsername = ownerUsername;
+    }
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "author_id")
     private Author author;
+
+    public void setOwner(AppUser owner) {
+        this.owner = owner;
+    }
+
+    public AppUser getOwner() {
+        return owner;
+    }
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "owner_id")
+    private AppUser owner;
+
+    public Post(AppUser owner) {
+        this.owner = owner;
+    }
 
     protected Post() {}
 

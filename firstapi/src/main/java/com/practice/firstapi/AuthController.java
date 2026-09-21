@@ -28,6 +28,10 @@ public class AuthController {
         String role = auth.getAuthorities().iterator().next().getAuthority();
         return new TokenResponse(jwtService.generateToken(request.username(),role));
     }
+    @GetMapping("/")
+    public String home() {
+        return "Авторизация прошла успешно! Добро пожаловать.";
+    }
     @PostMapping("/auth/register")
     @ResponseStatus(HttpStatus.CREATED)
     public void register(@Valid @RequestBody RegisterRequest request){

@@ -10,6 +10,7 @@ public class PostMapper {
                 , post.getBody()
                 , post.getAuthor().getName()
                 , post.getCreatedAt()
+                , post.getOwnerUsername()
         );
     }
     public Post toEntity(PostRequest request, Author author){

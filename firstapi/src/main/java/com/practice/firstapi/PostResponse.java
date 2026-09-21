@@ -8,4 +8,5 @@ public record PostResponse(
    , String body
    , String authorName
    , LocalDateTime createdAt
+   , String ownerUsername
 ) {}
