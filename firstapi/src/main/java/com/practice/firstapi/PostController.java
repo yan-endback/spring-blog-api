@@ -9,7 +9,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Repository;
 import org.springframework.web.bind.annotation.*;
 
-import java.nio.file.AccessDeniedException;
+import org.springframework.security.access.AccessDeniedException;
 import java.util.ArrayList;
 import java.util.List;
 @RestController
@@ -28,13 +28,13 @@ public class PostController {
     }
 
     @DeleteMapping("/posts/{id}")
-    public ResponseEntity<Void> delete(@PathVariable Long id) throws AccessDeniedException {
+    public ResponseEntity<Void> delete(@PathVariable Long id)  {
         service.delete(id);
     return ResponseEntity.noContent().build();
     }
     @PutMapping("/posts/{id}")
     public PostResponse update(@PathVariable Long id,
-           @Valid @RequestBody PostRequest request) throws AccessDeniedException {
+           @Valid @RequestBody PostRequest request)  {
         return service.update(id,request);
     }
     @GetMapping ("/posts")

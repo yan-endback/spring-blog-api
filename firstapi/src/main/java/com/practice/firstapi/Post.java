@@ -17,20 +17,6 @@ public class Post {
     private String body;
     private LocalDateTime createdAt;
 
-    public Post(String ownerUsername) {
-        this.ownerUsername = ownerUsername;
-    }
-
-    private String ownerUsername;
-
-    public String getOwnerUsername() {
-        return ownerUsername;
-    }
-
-    public void setOwnerUsername(String ownerUsername) {
-        this.ownerUsername = ownerUsername;
-    }
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "author_id")
     private Author author;

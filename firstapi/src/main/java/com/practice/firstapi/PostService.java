@@ -7,7 +7,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 
-import java.nio.file.AccessDeniedException;
+import org.springframework.security.access.AccessDeniedException;
 import java.util.List;
 
 @Service
@@ -53,7 +53,7 @@ public class PostService {
         repository.delete(post);
     }
 
-    private void checkCanModify(Post post) throws AccessDeniedException {
+    private void checkCanModify(Post post)  {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         String currentUser = auth.getName();
 
@@ -61,10 +61,13 @@ public class PostService {
                 .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
 
         if (isAdmin) return;
+        if (post.getOwner() == null){
+            throw new AccessDeniedException("У поста нет владельца — изменить может только администратор");
+        }
         if (!post.getOwner().getUsername().equals(currentUser))
             throw new AccessDeniedException("Это не ваш пост");
     }
-    public PostResponse update(Long id,PostRequest request) throws AccessDeniedException {
+    public PostResponse update(Long id,PostRequest request){
         Post post = repository.findById(id)
                 .orElseThrow(()-> new PostNotFoundException(id));
 

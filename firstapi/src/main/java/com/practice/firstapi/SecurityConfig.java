@@ -33,14 +33,19 @@ public class SecurityConfig {
                 .sessionManagement(s -> s.sessionCreationPolicy(
                         SessionCreationPolicy.STATELESS))
                 .exceptionHandling(ex -> ex
-                .authenticationEntryPoint((request, response, e) -> {
-                    response.setStatus(401);
-                })
-                .accessDeniedHandler((request, response, e) -> {
-                    response.setStatus(403);
-                }))
+                        .authenticationEntryPoint(((request, response, e) -> {
+                            response.setStatus(401);
+                            response.setContentType("application/problem+json");
+                            response.setCharacterEncoding("UTF-8");
+                            response.getWriter().write(
+                                    "{\"status\":401,\"title\":\"Unauthorized\",\"detail\":\"Нужен токен\"}");
+                        }))
+                        .accessDeniedHandler((request, response, e) -> {
+                            response.setStatus(403);
+                        }))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/auth/**").permitAll()
+                        .requestMatchers("/auth/login","/auth/register").permitAll()
+                        .requestMatchers(HttpMethod.GET,"/posts/my").authenticated()
                         .requestMatchers(HttpMethod.GET, "/posts/**").permitAll()
                         .anyRequest().authenticated())
                         .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
