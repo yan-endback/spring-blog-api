@@ -42,7 +42,7 @@ public class PostController {
         return service.findAll();
     }
     @PostMapping("/posts")
-    public ResponseEntity<PostResponse> create(@RequestBody PostRequest request ,@AuthenticationPrincipal UserDetails user){
+    public ResponseEntity<PostResponse> create(@Valid @RequestBody PostRequest request ,@AuthenticationPrincipal UserDetails user){
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(service.create(request,user.getUsername()));
     }
@@ -62,4 +62,6 @@ public class PostController {
     public List<PostResponse> myPosts(@AuthenticationPrincipal UserDetails user){
         return service.findMyPosts(user.getUsername());
     }
+
+
 }

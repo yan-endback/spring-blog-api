@@ -9,6 +9,10 @@ import java.util.List;
 @Entity
 @Table(name = "posts")
 public class Post {
+    public void setId(Long id) {
+        this.id = id;
+    }
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

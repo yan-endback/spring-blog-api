@@ -46,7 +46,7 @@ public class PostService {
    }
 
     @Transactional
-    public void delete(Long id) throws AccessDeniedException {
+    public void delete(Long id){
         Post post = repository.findById(id)
                 .orElseThrow(() -> new PostNotFoundException(id));
         checkCanModify(post);

@@ -9,7 +9,23 @@ public class AppUser {
 @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-@Column(nullable = false,unique = true)
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
+    public void setPasswordHash(String passwordHash) {
+        this.passwordHash = passwordHash;
+    }
+
+    public void setRole(Role role) {
+        this.role = role;
+    }
+
+    @Column(nullable = false,unique = true)
     private String username;
 
 @Column(nullable = false)
