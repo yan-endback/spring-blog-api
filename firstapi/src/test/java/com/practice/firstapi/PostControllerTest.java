@@ -2,11 +2,16 @@ package com.practice.firstapi;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.WebApplicationType;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
 import org.springframework.context.annotation.Import;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.test.context.support.WithMockUser;
@@ -21,6 +26,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import static org.hamcrest.Matchers.hasSize;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -60,17 +66,19 @@ public class PostControllerTest {
     }
     @Test
     void all_returnsTwoPosts() throws Exception{
-        when(postService.findAll()).thenReturn(List.of(
+        when(postService.findAll(any(Pageable.class)))
+                .thenReturn(new PageImpl<>(List.of(
                 new PostResponse(1L, "Первый", "Текст один", "murder",
                         LocalDateTime.now(), "murder"),
                 new PostResponse(2L, "Второй", "Текст два", "second",
-                        LocalDateTime.now(), "second")
+                        LocalDateTime.now(), "second"))
         ));
         mockMvc.perform(get("/posts"))
                 .andDo(print())
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$",hasSize(2)))
-                .andExpect(jsonPath("$[0].title").value("Первый"));
+                .andExpect(jsonPath("$.content",hasSize(2)))
+                .andExpect(jsonPath("$.content[0].title").value("Первый"))
+                .andExpect(jsonPath("$.totalElements").value(2));
     }
     @Test
     void byId_notFound_returns404() throws Exception{
@@ -100,7 +108,6 @@ public class PostControllerTest {
     }
     @Test
     @WithMockUser(username = "murder")
-    @AutoConfigureMockMvc(addFilters = true)
     void create_asUser_returns201() throws Exception{
         when(postService.create(any(), eq("murder"))).thenReturn(
                 new PostResponse(1L,"Тест","Текст","murder",
@@ -154,5 +161,23 @@ public class PostControllerTest {
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.errors.title").exists());
         verifyNoInteractions(postService);
+    }
+    @Test
+    void all_passesPageParamsToService() throws Exception {
+        when(postService.findAll(any(Pageable.class))).thenReturn(Page.empty());
+
+        mockMvc.perform(get("/posts")
+                .param("page", "1")
+                .param("size","5")
+                .param("sort","title,asc"))
+                .andExpect(status().isOk());
+
+        ArgumentCaptor<Pageable> captor = ArgumentCaptor.forClass(Pageable.class);
+        verify(postService).findAll(captor.capture());
+        Pageable p = captor.getValue();
+
+        assertEquals(1, p.getPageNumber());
+        assertEquals(5, p.getPageSize());
+        assertEquals(Sort.Direction.ASC, p.getSort().getOrderFor("title").getDirection());
     }
 }

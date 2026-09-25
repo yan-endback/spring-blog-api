@@ -1,6 +1,8 @@
 package com.practice.firstapi;
 
 import jakarta.transaction.Transactional;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Page;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -8,6 +10,7 @@ import org.springframework.stereotype.Service;
 
 
 import org.springframework.security.access.AccessDeniedException;
+
 import java.util.List;
 
 @Service
@@ -23,10 +26,9 @@ public class PostService {
         this.userRepo=apr;
     }
 
-    public List<PostResponse> findAll() {
-        return repository.findAllWithAuthors().stream()
-                .map(mapper::toResponse)
-                .toList();
+    public Page<PostResponse> findAll(Pageable pageable) {
+        return repository.findAll(pageable)
+                .map(mapper::toResponse);
     }
 
     public PostResponse getById(Long id){
