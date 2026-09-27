@@ -1,6 +1,6 @@
 package com.practice.firstapi;
 
-import jakarta.transaction.Transactional;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Page;
 import org.springframework.security.core.Authentication;
@@ -36,15 +36,15 @@ public class PostService {
                 .orElseThrow(()-> new PostNotFoundException(id));
         return mapper.toResponse(post);
     }
-
-   public PostResponse create (PostRequest request, String username) {
+    @Transactional
+   public PostResponse create (PostRequest request, String username)  {
        Author author = authorRepository.findById(request.authorId())
                .orElseThrow(() -> new AuthorNotFoundException(request.authorId()));
        AppUser owner = userRepo.findByUsername(username)
                .orElseThrow(() -> new UsernameNotFoundException(username));
        Post post = mapper.toEntity(request, author);
        post.setOwner(owner);
-       return mapper.toResponse(repository.save(post));
+        return mapper.toResponse(repository.save(post));
    }
 
     @Transactional
@@ -69,6 +69,7 @@ public class PostService {
         if (!post.getOwner().getUsername().equals(currentUser))
             throw new AccessDeniedException("Это не ваш пост");
     }
+    @Transactional
     public PostResponse update(Long id,PostRequest request){
         Post post = repository.findById(id)
                 .orElseThrow(()-> new PostNotFoundException(id));

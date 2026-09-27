@@ -1,5 +1,6 @@
 package com.practice.firstapi;
 
+import org.springframework.data.domain.Page;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -14,6 +15,8 @@ public interface PostRepository extends JpaRepository<Post,Long> {
 @Query("SELECT p FROM Post p JOIN FETCH p.author")
     List<Post> findAllWithAuthors();
 List<Post> findByOwnerUsername(String username);
-
+@EntityGraph(attributePaths = {"author","owner"})
+@Override
+Page<Post> findAll(Pageable pageable);
 
 }
