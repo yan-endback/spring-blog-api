@@ -70,9 +70,9 @@ public class PostService {
             throw new AccessDeniedException("Это не ваш пост");
     }
     @Transactional
-    public PostResponse update(Long id,PostRequest request){
+    public PostResponse update(Long id,PostRequest request) {
         Post post = repository.findById(id)
-                .orElseThrow(()-> new PostNotFoundException(id));
+                .orElseThrow(() -> new PostNotFoundException(id));
 
         checkCanModify(post);
 

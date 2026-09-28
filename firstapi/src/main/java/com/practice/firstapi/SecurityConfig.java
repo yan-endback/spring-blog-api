@@ -44,7 +44,7 @@ public class SecurityConfig {
                             response.setStatus(403);
                         }))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/auth/login","/auth/register").permitAll()
+                        .requestMatchers("/auth/login", "/auth/refresh", "/auth/logout","/auth/register").permitAll()
                         .requestMatchers(HttpMethod.GET,"/posts/my").authenticated()
                         .requestMatchers(HttpMethod.GET, "/posts/**").permitAll()
                         .anyRequest().authenticated())

@@ -94,4 +94,10 @@ public class GlobalExceptionHandler {
         return pd;
 
     }
+    @ExceptionHandler(InvalidRefreshTokenException.class)
+    public ProblemDetail handleInvalidRefresh(InvalidRefreshTokenException e){
+        return ProblemDetail.forStatusAndDetail(
+                HttpStatus.UNAUTHORIZED, e.getMessage());
+
+    }
 }
