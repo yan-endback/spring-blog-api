@@ -10,15 +10,21 @@ import java.util.Date;
 
 @Service
 public class JwtService {
-    private final SecretKey key = Keys.hmacShaKeyFor(
-            "очень-длинный-секретный-ключ-минимум-32-символа".getBytes());
 
-    public String generateToken(String username,String role){
+    private final AuthProperties props;
+    private final SecretKey key;
+
+    public JwtService(AuthProperties props) {
+        this.props = props;
+        this.key = Keys.hmacShaKeyFor(props.jwtSecret().getBytes(StandardCharsets.UTF_8));
+    }
+
+    public String generateToken(String username, String role){
         return Jwts.builder()
                 .subject(username)
                 .claim("role",role)
                 .issuedAt(new Date())
-                .expiration(new Date(System.currentTimeMillis() + 1000 * 60 * 15))
+                .expiration(new Date(System.currentTimeMillis() + props.accessTt1().toMillis()))
                 .signWith(key)
                 .compact();
     }

@@ -10,14 +10,13 @@ import java.util.UUID;
 @Service
 public class RefreshTokenService {
 
-    private static final Duration REFRESH_TTL = Duration.ofDays(7);
-
     private final RefreshTokenRepository repository;
     private final AppUserRepository userRepository;
-
-    public RefreshTokenService(RefreshTokenRepository repository, AppUserRepository userRepository) {
+    private final AuthProperties props;
+    public RefreshTokenService(RefreshTokenRepository repository, AppUserRepository userRepository,AuthProperties props) {
         this.repository = repository;
         this.userRepository = userRepository;
+        this.props = props;
     }
 
     public RefreshToken create(String username){
@@ -30,7 +29,7 @@ public class RefreshTokenService {
     public RefreshToken rotate(String value){
         RefreshToken old = repository.findByToken(value)
                 .orElseThrow(() ->
-                        new InvalidRefreshTokenException("Refresh-токен не найден,либо уже существует"));
+                        new InvalidRefreshTokenException("Refresh-токен не найден или уже использован"));
         if (old.isExpired()){
             throw new InvalidRefreshTokenException("Срок refresh-токена истек,войди заново");
         }
@@ -46,6 +45,6 @@ public class RefreshTokenService {
     public RefreshToken issue(AppUser user){
         String value = UUID.randomUUID().toString();
         return repository.save(new RefreshToken(
-                value,user, Instant.now().plus(REFRESH_TTL)));
+                value,user, Instant.now().plus(props.accessTt1())));
     }
 }
