@@ -1,5 +1,7 @@
 package com.practice.firstapi;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -13,6 +15,7 @@ public class RefreshTokenService {
     private final RefreshTokenRepository repository;
     private final AppUserRepository userRepository;
     private final AuthProperties props;
+    private static final Logger log = LoggerFactory.getLogger(RefreshTokenService.class);
     public RefreshTokenService(RefreshTokenRepository repository, AppUserRepository userRepository,AuthProperties props) {
         this.repository = repository;
         this.userRepository = userRepository;
@@ -28,12 +31,16 @@ public class RefreshTokenService {
     @Transactional
     public RefreshToken rotate(String value){
         RefreshToken old = repository.findByToken(value)
-                .orElseThrow(() ->
-                        new InvalidRefreshTokenException("Refresh-токен не найден или уже использован"));
+                .orElseThrow(() -> {
+                    log.warn("Обмен refresh отклонён: токен не найден или уже использован");
+                    return new InvalidRefreshTokenException("Refresh-токен не найден или уже использован");
+                });
         if (old.isExpired()){
+            log.warn("Обмен refresh отклонён: токен истёк, userId={}", old.getUser().getId());
             throw new InvalidRefreshTokenException("Срок refresh-токена истек,войди заново");
         }
         repository.delete(old);
+        log.debug("Refresh обменян для пользователя {}", old.getUser().getUsername());
         return issue(old.getUser());
     }
 

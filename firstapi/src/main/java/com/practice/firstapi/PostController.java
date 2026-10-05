@@ -1,6 +1,8 @@
 package com.practice.firstapi;
 
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
@@ -17,20 +19,19 @@ import org.springframework.data.domain.Pageable;
 import java.util.ArrayList;
 import java.util.List;
 @RestController
+@SecurityRequirement(name = "bearerAuth")
 public class PostController {
 
     private final PostService service;
 
     public PostController(PostService service){
         this.service=service;
-        System.out.println("создан КОНТРОЛЛЕР");
     }
 
     @GetMapping("/posts/{id}")
     public ResponseEntity<PostResponse> byId(@PathVariable Long id) {
         return ResponseEntity.ok(service.getById(id));
     }
-
     @DeleteMapping("/posts/{id}")
     public ResponseEntity<Void> delete(@PathVariable Long id)  {
         service.delete(id);

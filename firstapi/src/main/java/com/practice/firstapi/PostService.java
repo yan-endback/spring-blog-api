@@ -1,5 +1,7 @@
 package com.practice.firstapi;
 
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Page;
@@ -12,6 +14,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.security.access.AccessDeniedException;
 
 import java.util.List;
+
+import static com.practice.firstapi.JwtFilter.log;
+import static org.springframework.data.jpa.domain.AbstractPersistable_.id;
 
 @Service
 public class PostService {
@@ -31,6 +36,7 @@ public class PostService {
                 .map(mapper::toResponse);
     }
 
+    @Cacheable(value = "posts", key = "#id")
     public PostResponse getById(Long id){
         Post post = repository.findById(id)
                 .orElseThrow(()-> new PostNotFoundException(id));
@@ -44,9 +50,10 @@ public class PostService {
                .orElseThrow(() -> new UsernameNotFoundException(username));
        Post post = mapper.toEntity(request, author);
        post.setOwner(owner);
+        log.info("Пользователь {} создал пост {}", username, request.authorId());
         return mapper.toResponse(repository.save(post));
    }
-
+    @CacheEvict(value = "posts", key = "#id")
     @Transactional
     public void delete(Long id){
         Post post = repository.findById(id)
@@ -69,6 +76,8 @@ public class PostService {
         if (!post.getOwner().getUsername().equals(currentUser))
             throw new AccessDeniedException("Это не ваш пост");
     }
+
+    @CacheEvict(value = "posts", key = "#id")
     @Transactional
     public PostResponse update(Long id,PostRequest request) {
         Post post = repository.findById(id)
@@ -94,7 +103,7 @@ public class PostService {
                 .map(mapper::toResponse)
                 .toList();
     }
-
+    @CacheEvict(value = "posts", key = "#id")
     public void deleteAnyPost(Long id) {
         Post post = repository.findById(id)
                 .orElseThrow(() -> new PostNotFoundException(id));

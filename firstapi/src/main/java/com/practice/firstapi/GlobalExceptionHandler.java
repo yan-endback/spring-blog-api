@@ -58,9 +58,11 @@ public class GlobalExceptionHandler {
     public ProblemDetail unexpected(Exception e){
         log.error("Непредвиденная ошибка: ", e);
         ProblemDetail pd = ProblemDetail.forStatusAndDetail(
+
                 HttpStatus.INTERNAL_SERVER_ERROR,"Внутренняя ошибка сервера"
         );
         pd.setTitle("Ошибка сервера");
+        log.error("Необработанная ошибка", e);
         return pd;
     }
     @ExceptionHandler(AuthorNotFoundException.class)

@@ -44,7 +44,10 @@ public class SecurityConfig {
                             response.setStatus(403);
                         }))
                 .authorizeHttpRequests(auth -> auth
+                        .requestMatchers("/swagger-ui.html","/swagger-ui/**","/v3/api-docs/**").permitAll()
                         .requestMatchers("/auth/login", "/auth/refresh", "/auth/logout","/auth/register").permitAll()
+                        .requestMatchers("/actuator/health").permitAll()
+                        .requestMatchers("/actuator/**").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.GET,"/posts/my").authenticated()
                         .requestMatchers(HttpMethod.GET, "/posts/**").permitAll()
                         .anyRequest().authenticated())
